@@ -7,6 +7,8 @@ import com.library.exception.BookNotAvailableException;
 import com.library.exception.BorrowLimitExceededException;
 import com.library.exception.BookNotFoundException;
 import com.library.exception.MemberNotFoundException;
+import com.library.i18n.Language;
+import com.library.i18n.MessageManager;
 import com.library.service.BookService;
 import com.library.service.BorrowService;
 import com.library.service.MemberService;
@@ -27,21 +29,26 @@ public class ConsoleUI {
     private final MemberService memberService;
     private final BorrowService borrowService;
     private final Scanner scanner;
+    private final MessageManager msg;
 
     public ConsoleUI(BookService bookService, MemberService memberService, BorrowService borrowService) {
         this.bookService = bookService;
         this.memberService = memberService;
         this.borrowService = borrowService;
         this.scanner = new Scanner(System.in);
+        this.msg = MessageManager.getInstance();
     }
 
     public void start() {
-        System.out.println("Welcome to Library Management System");
-        System.out.println("==================================");
+        System.out.println();
+        System.out.println("╔══════════════════════════════════════════════════════╗");
+        System.out.println("║          " + msg.getMessage("app.title") + "          ║");
+        System.out.println("╚══════════════════════════════════════════════════════╝");
+        System.out.println();
 
         while (true) {
             showMainMenu();
-            int choice = getIntInput("Enter your choice: ");
+            int choice = getIntInput(msg.getMessage("menu.choice"));
 
             switch (choice) {
                 case 1:
@@ -53,166 +60,218 @@ public class ConsoleUI {
                 case 3:
                     borrowMenu();
                     break;
+                case 4:
+                    settingsMenu();
+                    break;
                 case 0:
-                    System.out.println("Thank you for using Library Management System!");
+                    System.out.println();
+                    System.out.println("╔══════════════════════════════════════════════════════╗");
+                    System.out.println("║          خداحافظ / Goodbye!                       ║");
+                    System.out.println("╚══════════════════════════════════════════════════════╝");
                     return;
                 default:
-                    System.out.println("Invalid choice. Please try again.");
+                    System.out.println(msg.getMessage("common.invalidInput"));
             }
         }
     }
 
     private void showMainMenu() {
-        System.out.println("\n--- Main Menu ---");
-        System.out.println("1. Book Management");
-        System.out.println("2. Member Management");
-        System.out.println("3. Borrow Management");
-        System.out.println("0. Exit");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│              " + msg.getMessage("menu.main") + "               │");
+        System.out.println("├─────────────────────────────────────────────────────┤");
+        System.out.println("│  " + msg.getMessage("menu.books") + "                       │");
+        System.out.println("│  " + msg.getMessage("menu.members") + "                      │");
+        System.out.println("│  " + msg.getMessage("menu.borrows") + "                     │");
+        System.out.println("│  " + msg.getMessage("menu.settings") + "                        │");
+        System.out.println("│  " + msg.getMessage("menu.exit") + "                            │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
     }
 
     private void bookMenu() {
         while (true) {
-            System.out.println("\n--- Book Management ---");
-            System.out.println("1. Add Book");
-            System.out.println("2. Update Book");
-            System.out.println("3. Delete Book");
-            System.out.println("4. Search Books");
-            System.out.println("5. View All Books");
-            System.out.println("6. View Book by ISBN");
-            System.out.println("0. Back to Main Menu");
+            System.out.println();
+            System.out.println("┌─────────────────────────────────────────────────────┐");
+            System.out.println("│            " + msg.getMessage("book.menu") + "           │");
+            System.out.println("├─────────────────────────────────────────────────────┤");
+            System.out.println("│  " + msg.getMessage("book.add") + "                          │");
+            System.out.println("│  " + msg.getMessage("book.update") + "                       │");
+            System.out.println("│  " + msg.getMessage("book.delete") + "                       │");
+            System.out.println("│  " + msg.getMessage("book.search") + "                        │");
+            System.out.println("│  " + msg.getMessage("book.viewAll") + "                      │");
+            System.out.println("│  " + msg.getMessage("book.viewByIsbn") + "                    │");
+            System.out.println("│  " + msg.getMessage("book.back") + "                         │");
+            System.out.println("└─────────────────────────────────────────────────────┘");
 
-            int choice = getIntInput("Enter your choice: ");
+            int choice = getIntInput(msg.getMessage("menu.choice"));
 
             switch (choice) {
-                case 1:
-                    addBook();
-                    break;
-                case 2:
-                    updateBook();
-                    break;
-                case 3:
-                    deleteBook();
-                    break;
-                case 4:
-                    searchBooks();
-                    break;
-                case 5:
-                    viewAllBooks();
-                    break;
-                case 6:
-                    viewBookByIsbn();
-                    break;
-                case 0:
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                case 1: addBook(); break;
+                case 2: updateBook(); break;
+                case 3: deleteBook(); break;
+                case 4: searchBooks(); break;
+                case 5: viewAllBooks(); break;
+                case 6: viewBookByIsbn(); break;
+                case 0: return;
+                default: System.out.println(msg.getMessage("common.invalidInput"));
             }
         }
     }
 
     private void memberMenu() {
         while (true) {
-            System.out.println("\n--- Member Management ---");
-            System.out.println("1. Register Member");
-            System.out.println("2. Update Member");
-            System.out.println("3. Delete Member");
-            System.out.println("4. Search Members");
-            System.out.println("5. View All Members");
-            System.out.println("0. Back to Main Menu");
+            System.out.println();
+            System.out.println("┌─────────────────────────────────────────────────────┐");
+            System.out.println("│            " + msg.getMessage("member.menu") + "          │");
+            System.out.println("├─────────────────────────────────────────────────────┤");
+            System.out.println("│  " + msg.getMessage("member.add") + "                     │");
+            System.out.println("│  " + msg.getMessage("member.update") + "                  │");
+            System.out.println("│  " + msg.getMessage("member.delete") + "                  │");
+            System.out.println("│  " + msg.getMessage("member.search") + "                   │");
+            System.out.println("│  " + msg.getMessage("member.viewAll") + "                  │");
+            System.out.println("│  " + msg.getMessage("member.back") + "                         │");
+            System.out.println("└─────────────────────────────────────────────────────┘");
 
-            int choice = getIntInput("Enter your choice: ");
+            int choice = getIntInput(msg.getMessage("menu.choice"));
 
             switch (choice) {
-                case 1:
-                    addMember();
-                    break;
-                case 2:
-                    updateMember();
-                    break;
-                case 3:
-                    deleteMember();
-                    break;
-                case 4:
-                    searchMembers();
-                    break;
-                case 5:
-                    viewAllMembers();
-                    break;
-                case 0:
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                case 1: addMember(); break;
+                case 2: updateMember(); break;
+                case 3: deleteMember(); break;
+                case 4: searchMembers(); break;
+                case 5: viewAllMembers(); break;
+                case 0: return;
+                default: System.out.println(msg.getMessage("common.invalidInput"));
             }
         }
     }
 
     private void borrowMenu() {
         while (true) {
-            System.out.println("\n--- Borrow Management ---");
-            System.out.println("1. Borrow Book");
-            System.out.println("2. Return Book");
-            System.out.println("3. View Borrow History");
-            System.out.println("4. View Active Borrows");
-            System.out.println("5. View Overdue Books");
-            System.out.println("0. Back to Main Menu");
+            System.out.println();
+            System.out.println("┌─────────────────────────────────────────────────────┐");
+            System.out.println("│            " + msg.getMessage("borrow.menu") + "          │");
+            System.out.println("├─────────────────────────────────────────────────────┤");
+            System.out.println("│  " + msg.getMessage("borrow.borrow") + "                     │");
+            System.out.println("│  " + msg.getMessage("borrow.return") + "                     │");
+            System.out.println("│  " + msg.getMessage("borrow.history") + "                    │");
+            System.out.println("│  " + msg.getMessage("borrow.active") + "                     │");
+            System.out.println("│  " + msg.getMessage("borrow.overdue") + "                    │");
+            System.out.println("│  " + msg.getMessage("borrow.back") + "                         │");
+            System.out.println("└─────────────────────────────────────────────────────┘");
 
-            int choice = getIntInput("Enter your choice: ");
+            int choice = getIntInput(msg.getMessage("menu.choice"));
 
             switch (choice) {
-                case 1:
-                    borrowBook();
-                    break;
-                case 2:
-                    returnBook();
-                    break;
-                case 3:
-                    viewBorrowHistory();
-                    break;
-                case 4:
-                    viewActiveBorrows();
-                    break;
-                case 5:
-                    viewOverdueBooks();
-                    break;
-                case 0:
-                    return;
-                default:
-                    System.out.println("Invalid choice. Please try again.");
+                case 1: borrowBook(); break;
+                case 2: returnBook(); break;
+                case 3: viewBorrowHistory(); break;
+                case 4: viewActiveBorrows(); break;
+                case 5: viewOverdueBooks(); break;
+                case 0: return;
+                default: System.out.println(msg.getMessage("common.invalidInput"));
             }
         }
     }
 
+    private void settingsMenu() {
+        while (true) {
+            System.out.println();
+            System.out.println("┌─────────────────────────────────────────────────────┐");
+            System.out.println("│              " + msg.getMessage("settings.menu") + "              │");
+            System.out.println("├─────────────────────────────────────────────────────┤");
+            System.out.println("│  " + msg.getMessage("settings.language") + "                          │");
+            System.out.println("│  " + msg.getMessage("settings.back") + "                         │");
+            System.out.println("└─────────────────────────────────────────────────────┘");
+            System.out.println();
+            System.out.println("    " + msg.getMessage("settings.language.current") + " " + msg.getCurrentLanguage().getDisplayName());
+
+            int choice = getIntInput(msg.getMessage("menu.choice"));
+
+            switch (choice) {
+                case 1:
+                    changeLanguage();
+                    break;
+                case 0:
+                    return;
+                default:
+                    System.out.println(msg.getMessage("common.invalidInput"));
+            }
+        }
+    }
+
+    private void changeLanguage() {
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│           " + msg.getMessage("settings.language.select") + "           │");
+        System.out.println("├─────────────────────────────────────────────────────┤");
+        System.out.println("│  " + msg.getMessage("settings.language.fa") + "                     │");
+        System.out.println("│  " + msg.getMessage("settings.language.en") + "                         │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        int choice = getIntInput(msg.getMessage("menu.choice"));
+
+        switch (choice) {
+            case 1:
+                msg.setLanguage(Language.FA);
+                System.out.println();
+                System.out.println("╔══════════════════════════════════════════════════════╗");
+                System.out.println("║      " + msg.getMessage("settings.language.changed") + "        ║");
+                System.out.println("╚══════════════════════════════════════════════════════╝");
+                break;
+            case 2:
+                msg.setLanguage(Language.EN);
+                System.out.println();
+                System.out.println("╔══════════════════════════════════════════════════════╗");
+                System.out.println("║      " + msg.getMessage("settings.language.changed") + "        ║");
+                System.out.println("╚══════════════════════════════════════════════════════╝");
+                break;
+            default:
+                System.out.println(msg.getMessage("common.invalidInput"));
+        }
+    }
+
     private void addBook() {
-        System.out.println("\n--- Add New Book ---");
-        String title = getStringInput("Enter title: ");
-        String author = getStringInput("Enter author: ");
-        String isbn = getStringInput("Enter ISBN: ");
-        Integer publishedYear = getIntInputOrNull("Enter published year (or press Enter to skip): ");
-        int quantity = getIntInput("Enter quantity: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("book.add.title") + "            │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        String title = getStringInput("    " + msg.getMessage("book.title"));
+        String author = getStringInput("    " + msg.getMessage("book.author"));
+        String isbn = getStringInput("    " + msg.getMessage("book.isbn"));
+        Integer publishedYear = getIntInputOrNull("    " + msg.getMessage("book.year"));
+        int quantity = getIntInput("    " + msg.getMessage("book.quantity"));
 
         try {
             Book book = new Book(title, author, isbn, publishedYear, quantity, quantity);
             bookService.addBook(book);
-            System.out.println("Book added successfully with ID: " + book.getId());
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("book.add.success") + book.getId());
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("common.error") + e.getMessage());
         }
     }
 
     private void updateBook() {
-        System.out.println("\n--- Update Book ---");
-        Long id = getLongInput("Enter book ID to update: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("book.update.title") + "           │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        Long id = getLongInput("    " + msg.getMessage("book.update.id"));
 
         try {
             Book existingBook = bookService.getBookById(id);
-            System.out.println("Current book details:");
-            System.out.println(existingBook);
+            System.out.println("    " + msg.getMessage("book.update.current"));
+            System.out.println("    " + existingBook);
 
-            String title = getStringInput("Enter new title (or press Enter to keep current): ");
-            String author = getStringInput("Enter new author (or press Enter to keep current): ");
-            String isbn = getStringInput("Enter new ISBN (or press Enter to keep current): ");
-            Integer publishedYear = getIntInputOrNull("Enter new published year (or press Enter to keep current): ");
-            Integer quantity = getIntInputOrNull("Enter new quantity (or press Enter to keep current): ");
+            String title = getStringInput("    " + msg.getMessage("book.update.newTitle"));
+            String author = getStringInput("    " + msg.getMessage("book.update.newAuthor"));
+            String isbn = getStringInput("    " + msg.getMessage("book.update.newIsbn"));
+            Integer publishedYear = getIntInputOrNull("    " + msg.getMessage("book.update.newYear"));
+            Integer quantity = getIntInputOrNull("    " + msg.getMessage("book.update.newQuantity"));
 
             if (!title.isEmpty()) existingBook.setTitle(title);
             if (!author.isEmpty()) existingBook.setAuthor(author);
@@ -221,89 +280,127 @@ public class ConsoleUI {
             if (quantity != null) existingBook.setQuantity(quantity);
 
             bookService.updateBook(existingBook);
-            System.out.println("Book updated successfully");
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("book.update.success"));
         } catch (BookNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("book.notFound") + id);
         }
     }
 
     private void deleteBook() {
-        System.out.println("\n--- Delete Book ---");
-        Long id = getLongInput("Enter book ID to delete: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("book.delete.title") + "           │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        Long id = getLongInput("    " + msg.getMessage("book.delete.id"));
 
         try {
             bookService.deleteBook(id);
-            System.out.println("Book deleted successfully");
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("book.delete.success"));
         } catch (BookNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("book.notFound") + id);
         }
     }
 
     private void searchBooks() {
-        System.out.println("\n--- Search Books ---");
-        String keyword = getStringInput("Enter search keyword (title or author): ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("book.search.title") + "            │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        String keyword = getStringInput("    " + msg.getMessage("book.search.keyword"));
 
         List<Book> books = bookService.searchBooks(keyword);
         if (books.isEmpty()) {
-            System.out.println("No books found matching the keyword");
+            System.out.println();
+            System.out.println("    " + msg.getMessage("book.search.notFound"));
         } else {
-            System.out.println("Found " + books.size() + " book(s):");
-            books.forEach(System.out::println);
+            System.out.println();
+            System.out.println("    " + msg.getMessage("book.search.results") + " " + books.size());
+            System.out.println("    ─────────────────────────────────────────────────");
+            books.forEach(b -> System.out.println("    " + b));
         }
     }
 
     private void viewAllBooks() {
-        System.out.println("\n--- All Books ---");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│           " + msg.getMessage("book.viewAll.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
         List<Book> books = bookService.getAllBooks();
         if (books.isEmpty()) {
-            System.out.println("No books available");
+            System.out.println();
+            System.out.println("    " + msg.getMessage("book.viewAll.empty"));
         } else {
-            System.out.println("Total books: " + books.size());
-            books.forEach(System.out::println);
+            System.out.println();
+            System.out.println("    " + msg.getMessage("book.viewAll.total") + " " + books.size());
+            System.out.println("    ─────────────────────────────────────────────────");
+            books.forEach(b -> System.out.println("    " + b));
         }
     }
 
     private void viewBookByIsbn() {
-        System.out.println("\n--- View Book by ISBN ---");
-        String isbn = getStringInput("Enter ISBN: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│         " + msg.getMessage("book.viewByIsbn.title") + "            │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        String isbn = getStringInput("    " + msg.getMessage("book.viewByIsbn.isbn"));
 
         try {
             Book book = bookService.getBookByIsbn(isbn);
-            System.out.println(book);
+            System.out.println();
+            System.out.println("    " + book);
         } catch (BookNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + e.getMessage());
         }
     }
 
     private void addMember() {
-        System.out.println("\n--- Register New Member ---");
-        String name = getStringInput("Enter name: ");
-        String nationalCode = getStringInput("Enter national code: ");
-        String phoneNumber = getStringInput("Enter phone number: ");
-        LocalDate joinDate = getDateInput("Enter join date (yyyy-MM-dd): ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│         " + msg.getMessage("member.add.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        String name = getStringInput("    " + msg.getMessage("member.name"));
+        String nationalCode = getStringInput("    " + msg.getMessage("member.nationalCode"));
+        String phoneNumber = getStringInput("    " + msg.getMessage("member.phone"));
+        LocalDate joinDate = getDateInput("    " + msg.getMessage("member.joinDate"));
 
         try {
             Member member = new Member(name, nationalCode, phoneNumber, joinDate);
             memberService.addMember(member);
-            System.out.println("Member registered successfully with ID: " + member.getId());
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("member.add.success") + member.getId());
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("common.error") + e.getMessage());
         }
     }
 
     private void updateMember() {
-        System.out.println("\n--- Update Member ---");
-        Long id = getLongInput("Enter member ID to update: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│         " + msg.getMessage("member.update.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        Long id = getLongInput("    " + msg.getMessage("member.update.id"));
 
         try {
             Member existingMember = memberService.getMemberById(id);
-            System.out.println("Current member details:");
-            System.out.println(existingMember);
+            System.out.println("    " + msg.getMessage("member.update.current"));
+            System.out.println("    " + existingMember);
 
-            String name = getStringInput("Enter new name (or press Enter to keep current): ");
-            String nationalCode = getStringInput("Enter new national code (or press Enter to keep current): ");
-            String phoneNumber = getStringInput("Enter new phone number (or press Enter to keep current): ");
-            LocalDate joinDate = getDateInputOrNull("Enter new join date (yyyy-MM-dd or press Enter to keep current): ");
+            String name = getStringInput("    " + msg.getMessage("member.update.newName"));
+            String nationalCode = getStringInput("    " + msg.getMessage("member.update.newNationalCode"));
+            String phoneNumber = getStringInput("    " + msg.getMessage("member.update.newPhone"));
+            LocalDate joinDate = getDateInputOrNull("    " + msg.getMessage("member.update.newJoinDate"));
 
             if (!name.isEmpty()) existingMember.setName(name);
             if (!nationalCode.isEmpty()) existingMember.setNationalCode(nationalCode);
@@ -311,112 +408,177 @@ public class ConsoleUI {
             if (joinDate != null) existingMember.setJoinDate(joinDate);
 
             memberService.updateMember(existingMember);
-            System.out.println("Member updated successfully");
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("member.update.success"));
         } catch (MemberNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("member.notFound") + id);
         }
     }
 
     private void deleteMember() {
-        System.out.println("\n--- Delete Member ---");
-        Long id = getLongInput("Enter member ID to delete: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│         " + msg.getMessage("member.delete.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        Long id = getLongInput("    " + msg.getMessage("member.delete.id"));
 
         try {
             memberService.deleteMember(id);
-            System.out.println("Member deleted successfully");
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("member.delete.success"));
         } catch (MemberNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("member.notFound") + id);
         }
     }
 
     private void searchMembers() {
-        System.out.println("\n--- Search Members ---");
-        String keyword = getStringInput("Enter search keyword (name): ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│         " + msg.getMessage("member.search.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        String keyword = getStringInput("    " + msg.getMessage("member.search.keyword"));
 
         List<Member> members = memberService.searchMembers(keyword);
         if (members.isEmpty()) {
-            System.out.println("No members found matching the keyword");
+            System.out.println();
+            System.out.println("    " + msg.getMessage("member.search.notFound"));
         } else {
-            System.out.println("Found " + members.size() + " member(s):");
-            members.forEach(System.out::println);
+            System.out.println();
+            System.out.println("    " + msg.getMessage("member.search.results") + " " + members.size());
+            System.out.println("    ─────────────────────────────────────────────────");
+            members.forEach(m -> System.out.println("    " + m));
         }
     }
 
     private void viewAllMembers() {
-        System.out.println("\n--- All Members ---");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("member.viewAll.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
         List<Member> members = memberService.getAllMembers();
         if (members.isEmpty()) {
-            System.out.println("No members registered");
+            System.out.println();
+            System.out.println("    " + msg.getMessage("member.viewAll.empty"));
         } else {
-            System.out.println("Total members: " + members.size());
-            members.forEach(System.out::println);
+            System.out.println();
+            System.out.println("    " + msg.getMessage("member.viewAll.total") + " " + members.size());
+            System.out.println("    ─────────────────────────────────────────────────");
+            members.forEach(m -> System.out.println("    " + m));
         }
     }
 
     private void borrowBook() {
-        System.out.println("\n--- Borrow Book ---");
-        Long bookId = getLongInput("Enter book ID: ");
-        Long memberId = getLongInput("Enter member ID: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("borrow.borrow.title") + "             │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        Long bookId = getLongInput("    " + msg.getMessage("borrow.borrow.bookId"));
+        Long memberId = getLongInput("    " + msg.getMessage("borrow.borrow.memberId"));
 
         try {
             BorrowRecord record = borrowService.borrowBook(bookId, memberId);
-            System.out.println("Book borrowed successfully. Borrow record ID: " + record.getId());
-        } catch (BookNotFoundException | MemberNotFoundException | BookNotAvailableException | BorrowLimitExceededException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("borrow.borrow.success") + record.getId());
+        } catch (BookNotFoundException e) {
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("borrow.borrow.bookNotFound"));
+        } catch (MemberNotFoundException e) {
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("borrow.borrow.memberNotFound"));
+        } catch (BookNotAvailableException e) {
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("borrow.borrow.notAvailable"));
+        } catch (BorrowLimitExceededException e) {
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("borrow.borrow.limitExceeded"));
         }
     }
 
     private void returnBook() {
-        System.out.println("\n--- Return Book ---");
-        Long borrowRecordId = getLongInput("Enter borrow record ID: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("borrow.return.title") + "             │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        Long borrowRecordId = getLongInput("    " + msg.getMessage("borrow.return.id"));
 
         try {
             BorrowRecord record = borrowService.returnBook(borrowRecordId);
-            System.out.println("Book returned successfully");
+            System.out.println();
+            System.out.println("    ✓ " + msg.getMessage("borrow.return.success"));
             if (record.getStatus().name().equals("OVERDUE")) {
-                System.out.println("Note: Book was returned with delay");
+                System.out.println("    ⚠ " + msg.getMessage("borrow.return.delay"));
             }
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("common.error") + e.getMessage());
         }
     }
 
     private void viewBorrowHistory() {
-        System.out.println("\n--- Borrow History ---");
-        Long memberId = getLongInput("Enter member ID: ");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("borrow.history.title") + "             │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
+        Long memberId = getLongInput("    " + msg.getMessage("borrow.history.memberId"));
 
         try {
             List<BorrowRecord> records = borrowService.getBorrowHistoryByMemberId(memberId);
             if (records.isEmpty()) {
-                System.out.println("No borrow history found for this member");
+                System.out.println();
+                System.out.println("    " + msg.getMessage("borrow.history.notFound"));
             } else {
-                System.out.println("Borrow history for member ID " + memberId + ":");
-                records.forEach(System.out::println);
+                System.out.println();
+                System.out.println("    " + msg.getMessage("borrow.history.results") + " " + records.size());
+                System.out.println("    ─────────────────────────────────────────────────");
+                records.forEach(r -> System.out.println("    " + r));
             }
         } catch (MemberNotFoundException e) {
-            System.out.println("Error: " + e.getMessage());
+            System.out.println();
+            System.out.println("    ✗ " + msg.getMessage("member.notFound") + memberId);
         }
     }
 
     private void viewActiveBorrows() {
-        System.out.println("\n--- Active Borrows ---");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("borrow.active.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
         List<BorrowRecord> records = borrowService.getActiveBorrows();
         if (records.isEmpty()) {
-            System.out.println("No active borrows");
+            System.out.println();
+            System.out.println("    " + msg.getMessage("borrow.active.empty"));
         } else {
-            System.out.println("Active borrows: " + records.size());
-            records.forEach(System.out::println);
+            System.out.println();
+            System.out.println("    " + msg.getMessage("borrow.active.total") + " " + records.size());
+            System.out.println("    ─────────────────────────────────────────────────");
+            records.forEach(r -> System.out.println("    " + r));
         }
     }
 
     private void viewOverdueBooks() {
-        System.out.println("\n--- Overdue Books ---");
+        System.out.println();
+        System.out.println("┌─────────────────────────────────────────────────────┐");
+        System.out.println("│          " + msg.getMessage("borrow.overdue.title") + "              │");
+        System.out.println("└─────────────────────────────────────────────────────┘");
+
         List<BorrowRecord> records = borrowService.getOverdueBooks();
         if (records.isEmpty()) {
-            System.out.println("No overdue books");
+            System.out.println();
+            System.out.println("    " + msg.getMessage("borrow.overdue.empty"));
         } else {
-            System.out.println("Overdue books: " + records.size());
-            records.forEach(System.out::println);
+            System.out.println();
+            System.out.println("    " + msg.getMessage("borrow.overdue.total") + " " + records.size());
+            System.out.println("    ─────────────────────────────────────────────────");
+            records.forEach(r -> System.out.println("    " + r));
         }
     }
 
@@ -427,7 +589,7 @@ public class ConsoleUI {
                 int value = Integer.parseInt(scanner.nextLine().trim());
                 return value;
             } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number");
+                System.out.println("    " + msg.getMessage("common.invalidInput"));
             }
         }
     }
@@ -439,7 +601,7 @@ public class ConsoleUI {
                 long value = Long.parseLong(scanner.nextLine().trim());
                 return value;
             } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number");
+                System.out.println("    " + msg.getMessage("common.invalidInput"));
             }
         }
     }
@@ -453,7 +615,7 @@ public class ConsoleUI {
         try {
             return Integer.parseInt(input);
         } catch (NumberFormatException e) {
-            System.out.println("Invalid number, keeping current value");
+            System.out.println("    " + msg.getMessage("common.invalidInput"));
             return null;
         }
     }
@@ -470,7 +632,7 @@ public class ConsoleUI {
                 String input = scanner.nextLine().trim();
                 return LocalDate.parse(input, DATE_FORMAT);
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format. Please use yyyy-MM-dd");
+                System.out.println("    " + msg.getMessage("common.invalidInput"));
             }
         }
     }
@@ -484,7 +646,7 @@ public class ConsoleUI {
         try {
             return LocalDate.parse(input, DATE_FORMAT);
         } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format, keeping current value");
+            System.out.println("    " + msg.getMessage("common.invalidInput"));
             return null;
         }
     }
