@@ -1,0 +1,106 @@
+I am a Java developer and I want to build a complete "Library Management System" project from scratch. Please act as a senior mentor and guide me step-by-step with full production-ready code, configuration files, database scripts, and documentation.
+
+**Project Technical Specifications:**
+--------------------------------------------------
+Language: Java 17 or higher
+Build Tool: Maven
+Database: H2 Database (embedded mode for development) OR PostgreSQL (for production) — please provide scripts for both.
+Architecture Layers: Entity/Model → DAO/Repository → Service → Console View (Menu-driven)
+Database Access: JDBC with Connection Pool (HikariCP)
+Logging: SLF4J with Logback
+Testing: JUnit 5 for unit tests
+Error Handling: Custom exceptions with global exception handling pattern
+
+**Core Entities (with exact fields):**
+--------------------------------------------------
+1. Book: id (Long), title (String), author (String), isbn (String, unique), publishedYear (Integer), quantity (Integer - total copies), availableQuantity (Integer - copies currently available for borrowing).
+
+2. Member: id (Long), name (String), nationalCode (String, unique), phoneNumber (String), joinDate (LocalDate).
+
+3. BorrowRecord: id (Long), bookId (Long), memberId (Long), borrowDate (LocalDate), returnDate (LocalDate - null if not returned yet), status (Enum: BORROWED, RETURNED, OVERDUE).
+
+**Functional Requirements (Must Implement):**
+--------------------------------------------------
+**Book Management:**
+- Add new book (validate ISBN uniqueness)
+- Update book details
+- Delete book (only if no active borrow records exist)
+- Search books by: title (partial match), author (partial match), or ISBN (exact match)
+- View all books with pagination support
+
+**Member Management:**
+- Register new member (validate nationalCode uniqueness and format)
+- Update member information
+- Delete member (only if no active borrows or outstanding records)
+- Search members by name or nationalCode
+
+**Borrowing Process (Core Feature):**
+- Borrow a book: Check if availableQuantity > 0 AND member has less than 3 active borrows
+- Return a book: Calculate overdue days (max borrow period is 14 days)
+- View borrowing history for a specific member
+- View list of all currently borrowed books (active borrows)
+- View overdue books list (borrowDate + 14 days < current date)
+
+**Business Rules:**
+--------------------------------------------------
+- Maximum active borrows per member: 3 books
+- Maximum borrow period: 14 days
+- If returned after 14 days, display warning message: "Book returned with delay"
+- No duplicate ISBN allowed for books
+- No duplicate nationalCode allowed for members
+
+**Technical Constraints:**
+--------------------------------------------------
+- Use Maven multi-module structure (optional but recommended)
+- Implement Repository pattern with Interfaces (e.g., BookRepository, MemberRepository)
+- Use DTOs (Data Transfer Objects) for transferring data between layers (don't expose entities directly)
+- All database queries must use PreparedStatement (prevent SQL injection)
+- Implement proper transaction management for borrow/return operations
+
+**Deliverables Required (Step-by-Step):**
+--------------------------------------------------
+Step 1: Provide complete database schema (DDL scripts for H2 and PostgreSQL) with proper indexes on isbn, nationalCode, and foreign keys with CASCADE rules where appropriate.
+
+Step 2: Provide complete pom.xml with all dependencies (H2/PostgreSQL driver, HikariCP, SLF4J, Logback, JUnit 5, Mockito).
+
+Step 3: Provide all Entity classes (POJOs) with proper annotations (if using JPA) or plain Java classes.
+
+Step 4: Provide DatabaseConnection class with HikariCP connection pool configuration.
+
+Step 5: Provide all Repository/DAO interfaces and implementations with methods:
+   - CRUD operations for each entity
+   - Custom finder methods (search by title, author, ISBN, etc.)
+   - Methods for borrow-specific queries (active borrows, overdue, history)
+
+Step 6: Provide all Service classes implementing business logic with:
+   - Input validation
+   - Business rule enforcement (max 3 books, availability checks)
+   - Transactional methods (borrowBook, returnBook)
+   - Custom exception classes (BookNotFoundException, MemberNotFoundException, BorrowLimitExceededException, BookNotAvailableException)
+
+Step 7: Provide Console-based UI (Menu-driven) with clear options for all features.
+
+Step 8: Provide at least 5 JUnit test cases for Service layer methods using Mockito (mocking repository layer).
+
+**Final Requirements (IMPORTANT):**
+--------------------------------------------------
+- Code must be clean, well-commented, and follow SOLID principles
+- Use meaningful package structure: com.library.entity, com.library.repository, com.library.service, com.library.exception, com.library.util
+- Provide a detailed README.md file that includes:
+   * Project title and description
+   * Technologies used (with versions)
+   * Prerequisites (Java, Maven, Database)
+   * Step-by-step setup instructions (clone, configure database, run migrations, build, and execute)
+   * Project structure explanation
+   * Screenshots of running application (optional but recommended)
+   * API/Database schema diagram (using ASCII or Mermaid)
+   * Troubleshooting common issues
+   * Future improvements section
+   * Author information and license
+
+- Provide a separate "user-guide.md" or include usage instructions in README.md showing how to navigate the menu
+- Provide database initialization script with sample data (at least 5 books, 3 members, and some borrow records for testing)
+
+**Final Output Format:**
+--------------------------------------------------
+Please organize your response by steps (1 through 8) with complete, copy-paste-ready code blocks. After all steps, provide the complete README.md content in a single code block that I can directly copy into my project.
