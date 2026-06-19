@@ -66,7 +66,7 @@ public class ConsoleUI {
                 case 0:
                     System.out.println();
                     System.out.println("╔══════════════════════════════════════════════════════╗");
-                    System.out.println("║          خداحافظ / Goodbye!                       ║");
+                    System.out.println("║          " + msg.getMessage("menu.exit") + "                          ║");
                     System.out.println("╚══════════════════════════════════════════════════════╝");
                     return;
                 default:

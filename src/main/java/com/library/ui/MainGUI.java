@@ -1,6 +1,8 @@
 package com.library.ui;
 
 import com.formdev.flatlaf.FlatDarkLaf;
+import com.library.i18n.Language;
+import com.library.i18n.MessageManager;
 import com.library.service.BookService;
 import com.library.service.BorrowService;
 import com.library.service.MemberService;
@@ -12,59 +14,171 @@ public class MainGUI extends JFrame {
     private final BookService bookService;
     private final MemberService memberService;
     private final BorrowService borrowService;
+    private final MessageManager msg;
+    private JTabbedPane tabbedPane;
+    private JPanel toolbar;
 
     public MainGUI(BookService bookService, MemberService memberService, BorrowService borrowService) {
         this.bookService = bookService;
         this.memberService = memberService;
         this.borrowService = borrowService;
+        this.msg = MessageManager.getInstance();
         initUI();
     }
 
     private void initUI() {
-        setTitle("\u0633\u06cc\u0633\u062a\u0645 \u0645\u062f\u06cc\u0631\u06cc\u062a \u06a9\u062a\u0627\u0628\u062e\u0627\u0646\u0647");
+        setTitle(msg.getMessage("app.title"));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1100, 750);
         setMinimumSize(new Dimension(900, 550));
         setLocationRelativeTo(null);
-        setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        applyOrientation();
 
-        JTabbedPane tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-        tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 14));
-        tabbedPane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-
-        DashboardPanel dashboard = new DashboardPanel(bookService, memberService, borrowService);
-        tabbedPane.addTab("\uD83D\uDCCA \u062f\u0627\u0634\u0628\u0648\u0631\u062f", dashboard);
-        tabbedPane.addTab("\uD83D\uDCDA \u06a9\u062a\u0627\u0628\u200c\u0647\u0627", new BooksPanel(bookService));
-        tabbedPane.addTab("\uD83D\uDC65 \u0627\u0639\u0636\u0627", new MembersPanel(memberService, borrowService));
-        tabbedPane.addTab("\uD83D\uDCD6 \u0627\u0645\u0627\u0646\u062a\u200c\u0647\u0627", new BorrowsPanel(borrowService, bookService, memberService));
-
-        setContentPane(tabbedPane);
-
-        JMenuBar menuBar = new JMenuBar();
-        menuBar.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        JMenu viewMenu = new JMenu("\u0646\u0645\u0627\u06cc\u0634");
-        viewMenu.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        JMenuItem refreshItem = new JMenuItem("\u0628\u0631\u0648\u0632\u0631\u0633\u0627\u0646\u06cc \u0647\u0645\u0647");
-        refreshItem.addActionListener(e -> {
-            int idx = tabbedPane.getSelectedIndex();
-            Component c = tabbedPane.getComponentAt(idx);
-            if (c instanceof Refreshable r) {
-                r.refresh();
-            }
-        });
-        viewMenu.add(refreshItem);
-        menuBar.add(viewMenu);
-        setJMenuBar(menuBar);
-
-        statusBar(dashboard);
+        buildToolbar();
+        buildMenuBar();
+        buildTabs();
+        buildStatusBar();
     }
 
-    private void statusBar(DashboardPanel dashboard) {
-        JPanel statusPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 2));
-        statusPanel.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
-        JLabel statusLabel = new JLabel("\u0622\u0645\u0627\u062f\u0647 \u0628\u0647 \u0633\u06cc\u0633\u062a\u0645 \u0645\u062f\u06cc\u0631\u06cc\u062a \u06a9\u062a\u0627\u0628\u062e\u0627\u0646\u0647 \u062e\u0648\u0634 \u0622\u0645\u062f\u06cc\u062f");
+    private void applyOrientation() {
+        ComponentOrientation orientation = isRTL()
+                ? ComponentOrientation.RIGHT_TO_LEFT
+                : ComponentOrientation.LEFT_TO_RIGHT;
+        applyOrientation(this, orientation);
+    }
+
+    private boolean isRTL() {
+        return msg.getCurrentLanguage() == Language.FA;
+    }
+
+    private void applyOrientation(Component c, ComponentOrientation o) {
+        c.setComponentOrientation(o);
+        if (c instanceof Container container) {
+            for (Component child : container.getComponents()) {
+                applyOrientation(child, o);
+            }
+        }
+    }
+
+    private void buildToolbar() {
+        toolbar = new JPanel(new FlowLayout(isRTL() ? FlowLayout.RIGHT : FlowLayout.LEFT, 5, 2));
+        toolbar.setComponentOrientation(isRTL() ? ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT);
+
+        JButton newBtn = createToolbarButton(msg.getMessage("gui.toolbar.new") + " +", e -> {
+            int idx = tabbedPane.getSelectedIndex();
+            Component c = tabbedPane.getComponentAt(idx);
+            if (c instanceof Refreshable r) r.refresh();
+        });
+        JButton refreshBtn = createToolbarButton(msg.getMessage("gui.toolbar.refresh") + " F5", e -> refreshCurrentTab());
+        JButton exportBtn = createToolbarButton(msg.getMessage("gui.toolbar.export"), e -> {
+            int idx = tabbedPane.getSelectedIndex();
+            Component c = tabbedPane.getComponentAt(idx);
+            if (c instanceof Exportable e2) e2.exportCSV();
+        });
+
+        JToggleButton langBtn = new JToggleButton(msg.getMessage("gui.toolbar.langToggle"));
+        langBtn.setToolTipText("FA / EN");
+        langBtn.addActionListener(e -> toggleLanguage());
+
+        toolbar.add(newBtn);
+        toolbar.add(refreshBtn);
+        toolbar.add(exportBtn);
+        toolbar.add(Box.createHorizontalGlue());
+        toolbar.add(langBtn);
+
+        add(toolbar, BorderLayout.NORTH);
+    }
+
+    private JButton createToolbarButton(String text, java.awt.event.ActionListener action) {
+        JButton btn = new JButton(text);
+        btn.setFocusPainted(false);
+        btn.addActionListener(action);
+        return btn;
+    }
+
+    private void buildMenuBar() {
+        JMenuBar menuBar = new JMenuBar();
+        menuBar.setComponentOrientation(isRTL() ? ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT);
+
+        JMenu fileMenu = new JMenu(isRTL() ? "فایل" : "File");
+        JMenuItem exitItem = new JMenuItem(isRTL() ? "خروج" : "Exit");
+        exitItem.addActionListener(e -> System.exit(0));
+        fileMenu.add(exitItem);
+        menuBar.add(fileMenu);
+
+        JMenu viewMenu = new JMenu(msg.getMessage("menu.settings"));
+        JMenuItem refreshItem = new JMenuItem(msg.getMessage("gui.toolbar.refresh"));
+        refreshItem.setAccelerator(KeyStroke.getKeyStroke("F5"));
+        refreshItem.addActionListener(e -> refreshCurrentTab());
+        viewMenu.add(refreshItem);
+        menuBar.add(viewMenu);
+
+        JMenu helpMenu = new JMenu(isRTL() ? "راهنما" : "Help");
+        JMenuItem aboutItem = new JMenuItem(msg.getMessage("gui.about.title"));
+        aboutItem.addActionListener(e -> showAboutDialog());
+        helpMenu.add(aboutItem);
+        menuBar.add(helpMenu);
+
+        setJMenuBar(menuBar);
+    }
+
+    private void buildTabs() {
+        tabbedPane = new JTabbedPane(JTabbedPane.TOP);
+        tabbedPane.setFont(new Font("SansSerif", Font.BOLD, 14));
+        tabbedPane.setComponentOrientation(isRTL() ? ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT);
+
+        tabbedPane.addTab(msg.getMessage("gui.tab.dashboard"), new DashboardPanel(bookService, memberService, borrowService));
+        tabbedPane.addTab(msg.getMessage("gui.tab.books"), new BooksPanel(bookService));
+        tabbedPane.addTab(msg.getMessage("gui.tab.members"), new MembersPanel(memberService, borrowService));
+        tabbedPane.addTab(msg.getMessage("gui.tab.borrows"), new BorrowsPanel(borrowService, bookService, memberService));
+
+        tabbedPane.addChangeListener(e -> {
+            int idx = tabbedPane.getSelectedIndex();
+            if (idx >= 0) {
+                Component c = tabbedPane.getComponentAt(idx);
+                if (c instanceof Refreshable r) r.refresh();
+            }
+        });
+
+        add(tabbedPane, BorderLayout.CENTER);
+    }
+
+    private void buildStatusBar() {
+        JPanel statusPanel = new JPanel(new FlowLayout(isRTL() ? FlowLayout.RIGHT : FlowLayout.LEFT, 10, 2));
+        statusPanel.setComponentOrientation(isRTL() ? ComponentOrientation.RIGHT_TO_LEFT : ComponentOrientation.LEFT_TO_RIGHT);
+        JLabel statusLabel = new JLabel(msg.getMessage("app.welcome"));
+        statusLabel.setFont(new Font("SansSerif", Font.PLAIN, 12));
         statusPanel.add(statusLabel);
         add(statusPanel, BorderLayout.SOUTH);
+    }
+
+    private void refreshCurrentTab() {
+        int idx = tabbedPane.getSelectedIndex();
+        if (idx >= 0) {
+            Component c = tabbedPane.getComponentAt(idx);
+            if (c instanceof Refreshable r) r.refresh();
+        }
+    }
+
+    private void toggleLanguage() {
+        Language current = msg.getCurrentLanguage();
+        msg.setLanguage(current == Language.FA ? Language.EN : Language.FA);
+        dispose();
+        launch(bookService, memberService, borrowService);
+    }
+
+    private void showAboutDialog() {
+        String msg_text = msg.getMessage("gui.about.appName") + "\n"
+                + msg.getMessage("gui.about.version") + "\n"
+                + msg.getMessage("gui.about.java") + ": " + System.getProperty("java.version") + "\n\n"
+                + msg.getMessage("gui.about.description");
+        JTextArea area = new JTextArea(msg_text);
+        area.setEditable(false);
+        area.setFont(new Font("SansSerif", Font.PLAIN, 14));
+        area.setBackground(UIManager.getColor("Panel.background"));
+        area.setForeground(UIManager.getColor("Panel.foreground"));
+        JOptionPane.showMessageDialog(this, new JScrollPane(area),
+                msg.getMessage("gui.about.title"), JOptionPane.INFORMATION_MESSAGE);
     }
 
     public static void launch(BookService bookService, MemberService memberService, BorrowService borrowService) {
@@ -74,7 +188,6 @@ public class MainGUI extends JFrame {
         UIManager.put("Button.arc", 8);
         UIManager.put("Component.arc", 8);
         UIManager.put("TextComponent.arc", 8);
-        UIManager.put("Table.showDeclaredHeadings", false);
 
         SwingUtilities.invokeLater(() -> {
             MainGUI gui = new MainGUI(bookService, memberService, borrowService);
