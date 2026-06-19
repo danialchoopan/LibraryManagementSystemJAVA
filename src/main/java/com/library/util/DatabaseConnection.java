@@ -5,10 +5,14 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 public class DatabaseConnection {
@@ -50,6 +54,35 @@ public class DatabaseConnection {
 
         dataSource = new HikariDataSource(config);
         logger.info("HikariCP connection pool initialized successfully");
+        initializeSchema();
+    }
+
+    private static void initializeSchema() {
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             InputStream schemaStream = DatabaseConnection.class.getClassLoader().getResourceAsStream("db/h2/schema.sql")) {
+            if (schemaStream == null) {
+                logger.warn("Schema file not found: db/h2/schema.sql");
+                return;
+            }
+            String sql = new String(schemaStream.readAllBytes(), StandardCharsets.UTF_8);
+            StringBuilder current = new StringBuilder();
+            for (String line : sql.split("\n")) {
+                String trimmed = line.trim();
+                if (trimmed.startsWith("--")) continue;
+                current.append(line).append("\n");
+                if (trimmed.endsWith(";")) {
+                    String stmtSql = current.toString().replace(";", "").trim();
+                    if (!stmtSql.isEmpty()) {
+                        stmt.execute(stmtSql);
+                    }
+                    current.setLength(0);
+                }
+            }
+            logger.info("Database schema initialized successfully");
+        } catch (Exception e) {
+            logger.error("Error initializing database schema", e);
+        }
     }
 
     public static Connection getConnection() throws SQLException {

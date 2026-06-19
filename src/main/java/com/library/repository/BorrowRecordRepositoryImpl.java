@@ -135,7 +135,7 @@ public class BorrowRecordRepositoryImpl implements BorrowRecordRepository {
 
     @Override
     public List<BorrowRecord> findOverdueRecords(LocalDate currentDate) {
-        String sql = "SELECT * FROM borrow_records WHERE status = 'BORROWED' AND borrow_date + INTERVAL '14 days' < ? ORDER BY borrow_date";
+        String sql = "SELECT * FROM borrow_records WHERE status = 'BORROWED' AND DATEADD(DAY, 14, borrow_date) < ? ORDER BY borrow_date";
         List<BorrowRecord> records = new ArrayList<>();
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

@@ -50,19 +50,3 @@ CREATE INDEX IF NOT EXISTS idx_borrow_records_borrow_date ON borrow_records(borr
 -- Create enum-like check constraints
 ALTER TABLE borrow_records ADD CONSTRAINT chk_borrow_status 
     CHECK (status IN ('BORROWED', 'RETURNED', 'OVERDUE'));
-
--- Create trigger to update updated_at timestamp
-CREATE TRIGGER IF NOT EXISTS trg_books_updated_at 
-    BEFORE UPDATE ON books 
-    FOR EACH ROW 
-    CALL "org.h2.api.Trigger" -- Placeholder; actual trigger logic in application
-
-CREATE TRIGGER IF NOT EXISTS trg_members_updated_at 
-    BEFORE UPDATE ON members 
-    FOR EACH ROW 
-    CALL "org.h2.api.Trigger" -- Placeholder; actual trigger logic in application
-
-CREATE TRIGGER IF NOT EXISTS trg_borrow_records_updated_at 
-    BEFORE UPDATE ON borrow_records 
-    FOR EACH ROW 
-    CALL "org.h2.api.Trigger" -- Placeholder; actual trigger logic in application
