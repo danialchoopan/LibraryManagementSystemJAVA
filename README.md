@@ -18,6 +18,9 @@ A complete Library Management System built with Java 17, Maven, JDBC, HikariCP, 
 - **بین‌المللی‌سازی / i18n**: فارسی (RTL) + English
 
 ---
+## تصاویر برنامه /Screenshot
+<img src="screenshot/1.jpg" height="500">
+
 
 ## پیش‌نیازها / Prerequisites
 

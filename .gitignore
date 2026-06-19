@@ -35,3 +35,8 @@ Thumbs.db
 
 # Environment files
 .env
+
+
+.mimocode
+
+.mimocode/*
