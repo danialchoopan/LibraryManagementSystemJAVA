@@ -1,154 +1,214 @@
-# Library Management System
+# سیستم مدیریت کتابخانه / Library Management System
 
-A complete Library Management System built with Java 17, Maven, JDBC, and HikariCP. This application manages books, members, and borrowing operations with a console-based interface.
+سیستم مدیریت کتابخانه کامل ساخته شده با Java 17، Maven، JDBC، HikariCP و رابط کاربری گرافیکی Swing. این برنامه مدیریت کتاب‌ها، اعضا و عملیات امانت را با رابط کاربری حرفه‌ای انجام می‌دهد.
 
-## Technologies Used
+A complete Library Management System built with Java 17, Maven, JDBC, HikariCP, and a professional Swing GUI. This application manages books, members, and borrowing operations with an RTL Farsi interface and dark theme.
 
-- **Language**: Java 17
-- **Build Tool**: Maven
-- **Database**: H2 (embedded) / PostgreSQL (production)
-- **Connection Pool**: HikariCP
-- **Logging**: SLF4J with Logback
-- **Testing**: JUnit 5, Mockito
+---
 
-## Prerequisites
+## فناوری‌های استفاده شده / Technologies Used
 
-- Java 17 or higher
-- Maven 3.6+
-- PostgreSQL (optional, for production)
+- **زبان / Language**: Java 17
+- **ابزار ساخت / Build Tool**: Maven
+- **پایگاه داده / Database**: H2 (embedded) / PostgreSQL (production)
+- **اتصال اتصال / Connection Pool**: HikariCP
+- **لاگ / Logging**: SLF4J with Logback
+- **تست / Testing**: JUnit 5, Mockito
+- **رابط کاربری / UI**: Java Swing + FlatDarkLaf (Dark Theme)
+- **بین‌المللی‌سازی / i18n**: فارسی (RTL) + English
 
-## Project Structure
+---
+
+## پیش‌نیازها / Prerequisites
+
+- Java 17 or higher / جاوا ۱۷ یا بالاتر
+- Maven 3.6+ / میون ۳.۶ یا بالاتر
+- PostgreSQL (optional, for production) / پستگرس (اختیاری)
+
+---
+
+## ساختار پروژه / Project Structure
 
 ```
 library-management-system/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/library/
-│   │   │   ├── entity/          # Entity classes (Book, Member, BorrowRecord)
-│   │   │   ├── repository/      # Repository interfaces and JDBC implementations
-│   │   │   ├── service/         # Service interfaces and business logic implementations
-│   │   │   ├── exception/       # Custom exception classes
-│   │   │   ├── ui/              # Console-based user interface
-│   │   │   ├── util/            # Database connection utility
-│   │   │   └── Main.java        # Application entry point
+│   │   │   ├── entity/          # کلاس‌های موجودیت / Entity classes (Book, Member, BorrowRecord)
+│   │   │   ├── repository/      # رابط‌ها و پیاده‌سازی JDBC / Repository interfaces and JDBC implementations
+│   │   │   ├── service/         # منطق کسب‌وکار / Service interfaces and business logic
+│   │   │   ├── exception/       # کلاس‌های خطای سفارشی / Custom exception classes
+│   │   │   ├── ui/              # رابط کاربری Swing / Swing GUI (Dashboard, Books, Members, Borrows)
+│   │   │   ├── i18n/            # بین‌المللی‌سازی / Internationalization (FA, EN)
+│   │   │   ├── util/            # ابزار اتصال پایگاه داده / Database connection utility
+│   │   │   └── Main.java        # نقطه ورود برنامه / Application entry point
 │   │   └── resources/
-│   │       ├── database.properties    # Database configuration
-│   │       ├── logback.xml           # Logging configuration
+│   │       ├── database.properties    # پیکربندی پایگاه داده / Database configuration
+│   │       ├── logback.xml           # پیکربندی لاگ / Logging configuration
+│   │       ├── i18n/                 # فایل‌های ترجمه / Translation files
 │   │       └── db/
-│   │           ├── h2/              # H2 database scripts
-│   │           └── postgresql/      # PostgreSQL database scripts
+│   │           ├── h2/              # اسکریپت‌های H2
+│   │           └── postgresql/      # اسکریپت‌های PostgreSQL
 │   └── test/
-│       └── java/com/library/service/  # Service layer tests
+│       └── java/com/library/service/  # تست‌های لایه سرویس / Service layer tests
 └── pom.xml
 ```
 
-## Setup Instructions
+---
 
-### 1. Clone the repository
+## دستورالعمل‌های راه‌اندازی / Setup Instructions
+
+### ۱. کلون مخزن / 1. Clone the repository
 ```bash
-git clone <repository-url>
-cd library-management-system
+git clone https://github.com/danialchoopan/LibraryManagementSystemJAVA.git
+cd LibraryManagementSystemJAVA
 ```
 
-### 2. Configure database
-Edit `src/main/resources/database.properties` to configure your database connection:
-- For H2 (default): No additional setup needed
-- For PostgreSQL: Update the JDBC URL, username, and password
+### ۲. پیکربندی پایگاه داده / 2. Configure database
+فایل `src/main/resources/database.properties` را ویرایش کنید:
+Edit `src/main/resources/database.properties`:
+- H2 (پیش‌فرض / default): نیازی به تنظیم اضافی نیست / No additional setup needed
+- PostgreSQL: URL JDBC، نام کاربری و رمز عبور را به‌روز کنید
 
-### 3. Initialize database
-Run the appropriate schema and data scripts:
-- H2: Execute `src/main/resources/db/h2/schema.sql` and `data.sql`
-- PostgreSQL: Execute `src/main/resources/db/postgresql/schema.sql` and `data.sql`
-
-### 4. Build the project
+### ۳. ساخت پروژه / 3. Build the project
 ```bash
 mvn clean compile
 ```
-
-### 5. Run the application
-```bash
-mvn exec:java -Dexec.mainClass="com.library.Main"
+یا / or:
+```batch
+.\mvnw.cmd compile
 ```
 
-## Features
+### ۴. اجرای برنامه / 4. Run the application
 
-### Book Management
-- Add, update, delete books
-- Search books by title, author, or ISBN
-- View all books with details
+**رابط کاربری گرافیکی (پیش‌فرض) / GUI mode (default):**
+```bash
+java -cp "target/classes;C:\Users\<username>\.m2\repository\com\formdev\flatlaf\3.4\flatlaf-3.4.jar;C:\Users\<username>\.m2\repository\com\zaxxer\HikariCP\5.1.0\HikariCP-5.1.0.jar;C:\Users\<username>\.m2\repository\org\slf4j\slf4j-api\2.0.9\slf4j-api-2.0.9.jar;C:\Users\<username>\.m2\repository\ch\qos\logback\logback-classic\1.4.14\logback-classic-1.4.14.jar;C:\Users\<username>\.m2\repository\ch\qos\logback\logback-core\1.4.14\logback-core-1.4.14.jar" com.library.Main
+```
 
-### Member Management
-- Register, update, delete members
-- Search members by name or national code
-- View all registered members
+یا فایل `run.bat` را اجرا کنید / Or just run `run.bat`
 
-### Borrowing System
-- Borrow books with validation
-- Return books with overdue detection
-- View borrowing history
-- View active borrows and overdue books
+**حالت کنسول / Console mode:**
+```bash
+java -cp "target/classes;..." com.library.Main --console
+```
 
-## Business Rules
+---
 
-- Maximum 3 active borrows per member
-- Maximum borrow period: 14 days
-- Overdue warning for returns after 14 days
-- ISBN uniqueness enforcement
-- National code uniqueness enforcement
+## امکانات / Features
 
-## Database Schema
+### مدیریت کتاب‌ها / Book Management
+- افزودن، ویرایش و حذف کتاب / Add, update, delete books
+- جستجو بر اساس عنوان، نویسنده یا شابک / Search by title, author, or ISBN
+- جدول با مرتب‌سازی ستون‌ها و فیلتر زنده / Table with column sorting and live filtering
+- نمایش رنگی موجودی (قرمز/زرد/سبز) / Color-coded availability display
+- خروجی CSV / CSV export
 
-### Books Table
-- id (BIGINT, PRIMARY KEY)
-- title (VARCHAR(255), NOT NULL)
-- author (VARCHAR(255), NOT NULL)
-- isbn (VARCHAR(20), UNIQUE)
-- published_year (INTEGER)
-- quantity (INTEGER)
-- available_quantity (INTEGER)
+### مدیریت اعضا / Member Management
+- ثبت‌نام، ویرایش و حذف عضو / Register, update, delete members
+- نمایش تعداد امانت‌های فعال هر عضو / Show active borrow count per member
+- جستجو و فیلتر زنده / Search and live filtering
+- خروجی CSV / CSV export
 
-### Members Table
-- id (BIGINT, PRIMARY KEY)
-- name (VARCHAR(255), NOT NULL)
-- national_code (VARCHAR(20), UNIQUE)
-- phone_number (VARCHAR(20))
-- join_date (DATE)
+### مدیریت امانت‌ها / Borrowing System
+- امانت گرفتن کتاب با اعتبارسنجی / Borrow books with validation
+- برگرداندن کتاب با تشخیص تأخیر / Return books with overdue detection
+- فیلتر: فعال، معوق، همه / Filter: Active, Overdue, All
+- تاریخچه امانت عضو / Member borrow history
+- نمایش وضعیت رنگی (امانت/برگردانده/معوق) / Color-coded status display
+- خروجی CSV / CSV export
 
-### Borrow Records Table
-- id (BIGINT, PRIMARY KEY)
-- book_id (BIGINT, FOREIGN KEY)
-- member_id (BIGINT, FOREIGN KEY)
-- borrow_date (DATE)
-- return_date (DATE)
-- status (VARCHAR(20): BORROWED, RETURNED, OVERDUE)
+### داشبورد / Dashboard
+- نمایش آمار کلی (کتاب‌ها، اعضا، امانت‌ها، معوق) / Stats cards (books, members, borrows, overdue)
+- لیست فعالیت‌های اخیر / Recent activity list
+- دکمه‌های دسترسی سریع / Quick action buttons
 
-## Testing
+### رابط کاربری / UI Features
+- تم تاریک (FlatDarkLaf) / Dark theme
+- پشتیبانی RTL فارسی / RTL Farsi support
+- تغییر زبان فارسی/انگلیسی از نوار ابزار / Language toggle from toolbar
+- میانبرهای صفحه‌کلید: F5 (بروزرسانی) / Keyboard shortcuts: F5 (refresh)
+- نوار ابزار با دکمه‌های سریع / Toolbar with quick action buttons
+- دیالوگ درباره با اطلاعات نسخه / About dialog with version info
 
-Run unit tests:
+---
+
+## قوانین کسب‌وکار / Business Rules
+
+- حداکثر ۳ امانت فعال برای هر عضو / Maximum 3 active borrows per member
+- حداکثر مدت امانت: ۱۴ روز / Maximum borrow period: 14 days
+- هشدار تأخیر برای برگشت بعد از ۱۴ روز / Overdue warning after 14 days
+- یکتایی شابک کتاب / ISBN uniqueness
+- یکتایی کد ملی عضو / National code uniqueness
+
+---
+
+## ساختار پایگاه داده / Database Schema
+
+### جدول کتاب‌ها / Books Table
+| ستون / Column | نوع / Type | توضیح / Description |
+|---|---|---|
+| id | BIGINT | کلید اصلی / Primary Key |
+| title | VARCHAR(255) | عنوان کتاب / Book Title |
+| author | VARCHAR(255) | نویسنده / Author |
+| isbn | VARCHAR(20) | شابک (یکتا) / ISBN (unique) |
+| published_year | INTEGER | سال انتشار / Published Year |
+| quantity | INTEGER | تعداد کل / Total Quantity |
+| available_quantity | INTEGER | تعداد موجود / Available Quantity |
+
+### جدول اعضا / Members Table
+| ستون / Column | نوع / Type | توضیح / Description |
+|---|---|---|
+| id | BIGINT | کلید اصلی / Primary Key |
+| name | VARCHAR(255) | نام / Name |
+| national_code | VARCHAR(20) | کد ملی (یکتا) / National Code (unique) |
+| phone_number | VARCHAR(20) | تلفن / Phone |
+| join_date | DATE | تاریخ عضویت / Join Date |
+
+### جدول امانت‌ها / Borrow Records Table
+| ستون / Column | نوع / Type | توضیح / Description |
+|---|---|---|
+| id | BIGINT | کلید اصلی / Primary Key |
+| book_id | BIGINT | کلید خارجی / Foreign Key → Books |
+| member_id | BIGINT | کلید خارجی / Foreign Key → Members |
+| borrow_date | DATE | تاریخ امانت / Borrow Date |
+| return_date | DATE | تاریخ برگشت / Return Date |
+| status | VARCHAR(20) | وضعیت: BORROWED, RETURNED, OVERDUE / Status |
+
+---
+
+## تست / Testing
+
 ```bash
 mvn test
 ```
 
-## Troubleshooting
+---
 
-1. **Database connection issues**: Verify database.properties configuration
-2. **Port conflicts**: Ensure PostgreSQL is running on the configured port
-3. **Memory issues**: Increase JVM heap size if needed: `-Xmx512m`
+## عیب‌یابی / Troubleshooting
 
-## Future Improvements
+1. **مشکل اتصال پایگاه داده**: پیکربندی database.properties را بررسی کنید / Database connection issues: Verify database.properties
+2. **تداخل پورت**: مطمئن شوید PostgreSQL در پورت تنظیم‌شده در حال اجراست / Port conflicts: Ensure PostgreSQL is running
+3. **مشکل حافظه**: اندازه heap JVM را افزایش دهید: `-Xmx512m` / Memory issues: Increase JVM heap size
 
-- Web-based UI (REST API + frontend)
-- User authentication and authorization
-- Email notifications for overdue books
-- Book reservation system
-- Fine calculation and payment tracking
-- Barcode/QR code integration
-- Audit logging
+---
 
-## Author
+## بهبودهای آینده / Future Improvements
 
-Library Management System - Built with Java and passion for clean code.
+- رابط وب (REST API + فرانت‌اند) / Web-based UI
+- احراز هویت کاربران / User authentication
+- اعلان‌های ایمیلی برای کتاب‌های معوق / Email notifications for overdue
+- سیستم رزرو کتاب / Book reservation
+- محاسبه جریمه / Fine calculation
+- یکپارچه‌سازی بارکد/QR / Barcode/QR integration
+- گزارش‌گیری حسابرسی / Audit logging
 
-## License
+---
 
-This project is open source and available under the MIT License.
+## نویسنده / Author
+
+ساخته شده با عشق به کدنویسی تمیز / Built with passion for clean code.
+
+## مجوز / License
+
+پروژه متن‌باز با مجوز MIT / Open source under MIT License.
